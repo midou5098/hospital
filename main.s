@@ -1,10 +1,9 @@
-.global_start
-.intel_syntax noprefix
+global _start
 bits 64
-.section .rodata
+section .rodata
 string:
-    .ascii "sup bitch(in assembly)\n"
-.section .text
+    db "sup bitch(in assembly)\n"
+section .text
 _start:
     mov rax,1
     mov rdi,1
