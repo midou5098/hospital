@@ -87,13 +87,30 @@ input resb 256
 
 
 section .text
+
 _start:
-    mov rax,1
-    mov rdi,1
-    lea rsi, [string]
-    mov rdx ,22
+    mov rax,9; this is a call for the mmap, apparently in assembly u do a alert→args→ssycall , interesting
+    xor rdi,rdi
+    mov rsi,doctor_size*8;her ethe size 
+    mov rdx,3 ;i dont actually need it since the data are not that precious but i ll just set it to 3 being read/write
+    mov r10,0x22
+    mov r8,-1
+    mov r9,0
     syscall
 
-    mov rax,60
-    mov rdi,0
-    syscall
+
+add_doctor:
+    mov rdi,id 
+    mov rsi,name
+    mov rdx,age
+
+
+
+
+
+
+
+
+
+
+
