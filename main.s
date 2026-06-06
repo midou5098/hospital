@@ -59,6 +59,9 @@ vec_len resq 1
 vec_cap resq 1
 input resb 256
 
+mode resb 0
+
+
 
 
 
@@ -97,6 +100,9 @@ _start:
     mov r8,-1
     mov r9,0
     syscall
+    mov [vec_data],rsx
+    mov [vec_cap],8
+    mov [vec_len],0 ; so the [] act like * , without them i d be writing to an daresss
 
 
 add_doctor:
@@ -106,11 +112,56 @@ add_doctor:
 
 
 
+_display:; apparently this is the equivalent of a switch
+    push rbp
+    mov  rbp, rsp;and these are called prologue ,gotta be at the top of every fonction
+    mov al,[mode]
+    
+    cmp al,0
+    je .cas0
+
+    cmp al,1
+    je .cas1
+
+    cmp al,11
+    je .cas11
+
+jmp .default
 
 
+.cas0:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    mov rsi,menu
+    mov rdx,menu_len
+    syscall
+    jmp .end_switch
+    
 
+.cas1:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    mov rsi,doc_menu
+    mov rdx,doc_menu_len
+    syscall
+    jmp .end_switch
+    
 
-
-
-
-
+.cas11:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    mov rsi,doc_add_id
+    mov rdx,docid_menu_len
+    syscall
+    jmp .end_switch
+    
+.default:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    mov rsi,menu
+    mov rdx,menu_len
+    syscall
+    jmp .end_switch
+end_switch:
+    leave
+    ret
