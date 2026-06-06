@@ -1,5 +1,11 @@
 global _start
 bits 64
+
+struc doctor
+    .id resd 1
+    .name resb 64
+    .age resd 1
+endstruc
 section .rodata
 menu:
     db "<=================hospital menu===============>",10
@@ -48,12 +54,10 @@ docage_menu_len equ $ -doc_add_age
 
 section .bss
 
-vec_data 
-
-struc doctor
-    .id resd 4
-    .name resb 64
-    .age resd 4
+vec_data resq 1
+vec_len resq 1
+vec_cap resq 1
+input resb 256
 
 
 
