@@ -126,10 +126,14 @@ _start:
 
 
 
-.doc_fill
+.doc_fill:
     mov al,[counter]
     cmp al,0
     je .cpy_id_doc
+    cmp al,1
+    je .cpy_name_doc
+    cmp al,2
+    je .cpy_age_doc
 
 
 
@@ -138,10 +142,36 @@ _start:
 
 .cpy_id_doc:
     lea rsi,[input]
-    lea rdi,[input]
-    mov rsx,64
-    rep movsb
+    call atoi
+    mov [tempid],eax;eax is the lower 32 bits , 
+    inc [counter]
+    jmp .loop
 
+
+.cpy_name_doc:
+    lea rsi,[input]
+    lea rdi,[tempname]
+    mov rcx, 64
+    inc [counter]
+    jmp .loop
+
+.cpy_age_doc:
+    lea rsi,[input]
+    call atoi
+    mov [tempage],eax;eax is the lower 32 bits , 
+    mov byte counter,0
+    mov rdi ,[tempid]
+    lea rsi ,[tempname]
+    mov rdx ,[tempage]
+    call push_doc
+    .set_mode0
+    jmp .loop
+
+
+
+push_doc:
+    push rbp
+    mov  rbp, rsp
 
 
 
@@ -311,4 +341,9 @@ atoi:
     jg .done
     sub cl,'0'
     imul rax,10
+    add rax,rcx
     inc rdi
+
+.done :
+    leave 
+    ret
