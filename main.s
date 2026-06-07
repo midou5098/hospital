@@ -159,12 +159,12 @@ _start:
     lea rsi,[input]
     call atoi
     mov [tempage],eax;eax is the lower 32 bits , 
-    mov byte counter,0
+    mov byte [counter],0
     mov rdi ,[tempid]
     lea rsi ,[tempname]
     mov rdx ,[tempage]
     call push_doc
-    .set_mode0
+    jmp .set_mode0
     jmp .loop
 
 
@@ -172,6 +172,27 @@ _start:
 push_doc:
     push rbp
     mov  rbp, rsp
+    mov al,[vec_cap]
+    cmp al,[vec_len]
+    jl .affect
+    je .expand
+
+
+.affect:
+    mov rbx,[vec_data]
+    mov rax,[vec_len]
+    imul rax,doctor_size
+    add rbx,rax
+    mov eax,[tempid]
+    mov [rbx+doctor.id],eax
+    lea rax,[tempname]
+    lea [rbx+doc.name],rax
+    mov rcx,64
+    rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
+    mov eax,[tempage]
+    mov [rbx+doctor.age],eax
+    inc qword [vec_len]
+
 
 
 
@@ -240,7 +261,7 @@ read_input:
     mov rbp,rsp
     mov rax,0
     mov rdi,0
-    lea rsi,[input] ,;so i need to use lea to pass adresses
+    lea rsi,[input] ;so i need to use lea to pass adresses
     mov rdx,256
     syscall
     leave
