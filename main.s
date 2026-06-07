@@ -101,9 +101,14 @@ _start:
     mov r8d,-1
     mov r9d,0
     syscall
-    mov [vec_data],rax
+    mov qword [vec_data],rax
     mov qword [vec_cap],8
     mov qword [vec_len],0 ; so the [] act like * , without them i d be writing to an daresss
+    
+    
+
+
+.loop:
     call _display
     call read_input
     mov al,[input]
@@ -111,9 +116,22 @@ _start:
     je .set_mode1
     cmp al,'4'
     je .exit
+
+
+
+
+
+
+
+
+
+
+
+
+    
 .set_mode1:
     mov byte [mode],1
-    jmp .exit
+    jmp .loop
 
 
 
