@@ -220,10 +220,16 @@ transfer:
     cmp al,[vec_len]
     je .loop
     jl .copy
+    .transfer
 
 .copy:
     imul rcx,doctor_size
-    
+    lea rsi,[vec_data+rcx]
+    lea rsd,[rdi+rcx]
+
+
+
+
 
 
 
