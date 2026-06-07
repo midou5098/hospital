@@ -141,10 +141,10 @@ _start:
 
 
 .cpy_id_doc:
-    lea rsi,[input]
+    lea rdi,[input]
     call atoi
     mov [tempid],eax;eax is the lower 32 bits , 
-    inc [counter]
+    inc byte [counter]
     jmp .loop
 
 
@@ -152,11 +152,12 @@ _start:
     lea rsi,[input]
     lea rdi,[tempname]
     mov rcx, 64
-    inc [counter]
+    rep movsb
+    inc byte [counter]
     jmp .loop
 
 .cpy_age_doc:
-    lea rsi,[input]
+    lea rdi,[input]
     call atoi
     mov [tempage],eax;eax is the lower 32 bits , 
     mov byte [counter],0
@@ -166,87 +167,6 @@ _start:
     call push_doc
     jmp .set_mode0
     jmp .loop
-
-
-
-push_doc:
-    push rbp
-    mov  rbp, rsp
-    mov al,[vec_cap]
-    cmp al,[vec_len]
-    jl .affect
-    je .expand
-
-
-.affect:
-    mov rbx,[vec_data]
-    mov rax,[vec_len]
-    imul rax,doctor_size
-    add rbx,rax
-    mov eax,[tempid]
-    mov [rbx+doctor.id],eax
-    lea rsi,[tempname]
-    lea rdi,[rbx+doctor.name]
-    mov rcx,64
-    rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
-    mov eax,[tempage]
-    mov [rbx+doctor.age],eax
-    inc qword [vec_len]
-    mov [mode],1
-    jmp .loop
-
-.expand:
-    mov rax,9
-    xor rdi,rdi
-    mov rbp,[vec_len]
-    imul rbp,2
-    mov rsi,doctor_size*rbp
-    mov rdx,3
-    mov r10d,0x22
-    mov r8d,-1
-    mov r9d,0
-    syscall
-    lea rdi,rax
-    call transfer
-
-
-
-
-
-transfer:
-    push rbp
-    mov rbp,rsp
-    mov al,rcx
-    cmp al,[vec_len]
-    je .loop
-    jl .copy
-    .transfer
-
-.copy:
-    imul rcx,doctor_size
-    lea rsi,[vec_data+rcx]
-    lea rsd,[rdi+rcx]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -286,6 +206,107 @@ transfer:
     mov rax,60
     xor rdi,rdi
     syscall
+push_doc:
+    push rbp
+    mov  rbp, rsp
+    mov rax,[vec_cap]
+    cmp rax,[vec_len]
+    jg .affect
+    je .expand
+    inc qword [vec_len]
+    leave
+    ret 
+
+
+.affect:
+    mov rbx,[vec_data]
+    mov rax,[vec_len]
+    imul rax,doctor_size
+    add rbx,rax
+    mov eax,[tempid]
+    mov [rbx+doctor.id],eax
+    lea rsi,[tempname]
+    lea rdi,[rbx+doctor.name]
+    mov rcx,64
+    rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
+    mov eax,[tempage]
+    mov [rbx+doctor.age],eax
+    inc qword [vec_len]
+    mov [mode],1
+    leave
+    ret 
+
+.expand:
+    push rbx
+    push r12
+    mov r12,[vec_data]
+    mov rbx , [vec_cap]
+    
+    
+    mov rax,9
+    xor rdi,rdi
+    mov rsi,[vec_cap]
+    shl rsi,1
+    imul rsi,doctor_size
+    mov rdx,3
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
+    syscall
+
+
+
+   
+    mov rdi,rax
+    mov rsi,r12
+    mov rcx,[vec_len]
+    imul rcx,doctor_size
+    rep movsb
+
+    push rax
+    mov rdi,r12
+    imul rbx,doctor_size
+    mov rsi,rbx
+    mov rax,11
+    syscall
+    pop rax
+
+    mov [vec_data],rax
+    shl qword [vec_cap],1
+    pop r12
+    pop rbx
+    jmp .affect
+
+
+
+;.copy:
+ ;   imul rcx,doctor_size
+  ;  lea rsi,[vec_data+rcx]
+   ; lea rsd,[rdi+rcx]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 read_input:
     push rbp
@@ -322,16 +343,23 @@ read_input:
 _display:; apparently this is the equivalent of a switch
     push rbp
     mov  rbp, rsp;and these are called prologue ,gotta be at the top of every fonction
-    mov al,[mode]
     
-    cmp al,0
-    je .cas0
+    mov al,[counter]
+    cmp al,1
+    je .adocid
+
+    cmp al,2
+    je .adocnam
+    
+    cmp al,3
+    je .adocg
+
+    mov al,[input]
 
     cmp al,1
     je .cas1
 
-    cmp al,2
-    je .cas2
+    
 
 jmp .default
 
@@ -354,11 +382,26 @@ jmp .default
     jmp .end_switch
     
 
-.cas2:
+.adocid:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_add_id]
     mov rdx,docid_menu_len
+    syscall
+    jmp .end_switch
+
+.adocnam:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[doc_add_name]
+    mov rdx,docnam_menu_len
+    syscall
+    jmp .end_switch
+.adocg:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[doc_add_age]
+    mov rdx,docage_menu_len
     syscall
     jmp .end_switch
     
@@ -395,6 +438,7 @@ atoi:
     imul rax,10
     add rax,rcx
     inc rdi
+    jmp .loop
 
 .done :
     leave 
