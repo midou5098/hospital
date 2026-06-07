@@ -71,7 +71,7 @@ counter resb 1;so also , .bss initializes to 0 with every new var created here
 
 
 
-
+old_size resd 1
 
 
 
@@ -185,20 +185,45 @@ push_doc:
     add rbx,rax
     mov eax,[tempid]
     mov [rbx+doctor.id],eax
-    lea rax,[tempname]
-    lea [rbx+doc.name],rax
+    lea rsi,[tempname]
+    lea rdi,[rbx+doctor.name]
     mov rcx,64
     rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
     mov eax,[tempage]
     mov [rbx+doctor.age],eax
     inc qword [vec_len]
+    mov [mode],1
+    jmp .loop
+
+.expand:
+    mov rax,9
+    xor rdi,rdi
+    mov rbp,[vec_len]
+    imul rbp,2
+    mov rsi,doctor_size*rbp
+    mov rdx,3
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
+    syscall
+    lea rdi,rax
+    call transfer
 
 
 
 
 
+transfer:
+    push rbp
+    mov rbp,rsp
+    mov al,rcx
+    cmp al,[vec_len]
+    je .loop
+    jl .copy
 
-
+.copy:
+    imul rcx,doctor_size
+    
 
 
 
