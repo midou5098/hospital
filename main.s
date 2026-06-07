@@ -111,10 +111,12 @@ _start:
 .loop:
     call _display
     call read_input
-    mov al,[input]
-    cmp al,'1'
-    je .set_mode1
-    cmp al,'4'
+    mov al,[mode]
+    cmp al,0
+    je .menu_handel
+    cmp al,1
+    je .docmenu_handel
+    cmp al,4
     je .exit
 
 
@@ -124,7 +126,20 @@ _start:
 
 
 
+.menu_handel:
+    mov al,[input]
+    cmp al,'1'
+    je .set_mode1
+    jmp .loop
 
+
+.docmenu_handel:
+    mov al,[input]
+    cmp al,'1'
+    je .set_mode2
+    cmp al,'4'
+    je .set_mode0
+    jmp .loop
 
 
 
@@ -133,8 +148,13 @@ _start:
     mov byte [mode],1
     jmp .loop
 
+.set_mode2:
+    mov byte [mode],2
+    jmp .loop
 
-
+.set_mode0:
+    mov byte [mode],0
+    jmp .loop
 
 .exit:
     mov rax,60
@@ -184,8 +204,8 @@ _display:; apparently this is the equivalent of a switch
     cmp al,1
     je .cas1
 
-    cmp al,11
-    je .cas11
+    cmp al,2
+    je .cas2
 
 jmp .default
 
@@ -208,7 +228,7 @@ jmp .default
     jmp .end_switch
     
 
-.cas11:
+.cas2:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_add_id]
