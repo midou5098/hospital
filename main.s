@@ -126,9 +126,14 @@ _start:
     je .doc_fill
     cmp al,4
     je .doc_fill
+    cmp al,5
+    je .search_h
 
 
-
+.search_h:
+    mov al,[input]
+    mov rdi,al
+    call atoi
 
 .doc_fill:
     mov al,[counter]
