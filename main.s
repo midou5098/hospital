@@ -63,9 +63,11 @@ input resb 256
 mode resb 1
 
 
+tempid resd 1
+tempname resb 64
+tempage resd 1
 
-
-
+counter resb 1;so also , .bss initializes to 0 with every new var created here 
 
 
 
@@ -116,8 +118,50 @@ _start:
     je .menu_handel
     cmp al,1
     je .docmenu_handel
+    cmp al,2
+    je .doc_fill
     cmp al,4
     je .exit
+
+
+
+
+.doc_fill
+    mov al,[counter]
+    cmp al,0
+    je .cpy_id_doc
+
+
+
+
+
+
+.cpy_id_doc:
+    lea rsi,[input]
+    lea rdi,[input]
+    mov rsx,64
+    rep movsb
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -246,3 +290,25 @@ jmp .default
 .end_switch:
     leave
     ret
+
+
+
+
+
+
+
+
+atoi:
+    push rbp
+    mov rbp,rsp
+    xor rax,rax
+    xor rcx,rcx
+.loop:
+    mov cl,[rdi]
+    cmp cl,'0'
+    jl .done
+    cmp cl,'9'
+    jg .done
+    sub cl,'0'
+    imul rax,10
+    inc rdi
