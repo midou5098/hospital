@@ -127,13 +127,38 @@ _start:
     cmp al,4
     je .doc_fill
     cmp al,5
-    je .search_h
-
+    je .ssearch_h
+.ssearch_h:
+    xor rcx, rcx 
+    lea rdi,[input]
+    call atoi
+    xor rcx,rcx
+    jmp .search_h
 
 .search_h:
-    mov al,[input]
-    mov rdi,al
-    call atoi
+    cmp rcx,[vec_len]
+    je .not_found
+    
+    mov rbx,[vec_data]
+    mov rdx,rcx
+    imul rdx,doctor_size
+    add rbx,rdx
+    cmp [rbx+doctor.id],eax
+    je .found
+    inc rcx
+    jmp .search_h
+.not_found:
+    mov [mode],0
+    jmp .loop
+.found:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[rbx+doctor.name]
+    mov rdx,64
+    syscall
+    jmp .loop
+
+
 
 .doc_fill:
     mov al,[counter]
