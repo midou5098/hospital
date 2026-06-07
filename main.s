@@ -50,7 +50,9 @@ doc_add_age:
     db "enter the age ",10
     
 docage_menu_len equ $ -doc_add_age
-
+doc_search_id:
+    db "enter the doctor id to look for",10
+docsid_len equ $ -doc_search_id
 
 
 section .bss
@@ -180,6 +182,7 @@ _start:
     mov al,[input]
     cmp al,'1'
     je .set_mode1
+    
     jmp .loop
 
 
@@ -187,6 +190,8 @@ _start:
     mov al,[input]
     cmp al,'1'
     je .set_mode2
+    cmp al,'2'
+    je .set_mode5
     cmp al,'4'
     je .set_mode0
     jmp .loop
@@ -197,7 +202,9 @@ _start:
 .set_mode1:
     mov byte [mode],1
     jmp .loop
-
+.set_mode5:
+    mov byte [mode],5
+    jmp .loop
 .set_mode2:
     mov byte [mode],2
     jmp .loop
@@ -363,6 +370,8 @@ _display:; apparently this is the equivalent of a switch
 
     cmp al,4
     je .cas4
+    cmp al,5
+    je .cas5
 
     
 
@@ -411,7 +420,13 @@ jmp .default
     mov rdx,docage_menu_len
     syscall
     jmp .end_switch
-    
+.cas5:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[doc_search_id]
+    mov rdx,docsid_len
+    syscall
+    jmp .end_switch
 .default:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
