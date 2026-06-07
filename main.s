@@ -105,6 +105,33 @@ _start:
     mov [vec_len],0 ; so the [] act like * , without them i d be writing to an daresss
 
 
+
+read_input:
+    push rbp
+    mov rbp,rsp
+    mov rax,0
+    mov rdi,0
+    mov rsi,input
+    mov rdx,256
+    syscall
+    leave
+    ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 add_doctor:
     mov rdi,id 
     mov rsi,name
@@ -162,6 +189,6 @@ jmp .default
     mov rdx,menu_len
     syscall
     jmp .end_switch
-end_switch:
+.end_switch:
     leave
     ret
