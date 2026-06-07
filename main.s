@@ -120,8 +120,10 @@ _start:
     je .docmenu_handel
     cmp al,2
     je .doc_fill
+    cmp al,3
+    je .doc_fill
     cmp al,4
-    je .exit
+    je .doc_fill
 
 
 
@@ -145,6 +147,7 @@ _start:
     call atoi
     mov [tempid],eax;eax is the lower 32 bits , 
     inc byte [counter]
+    mov byte [mode],3
     jmp .loop
 
 
@@ -154,6 +157,7 @@ _start:
     mov rcx, 64
     rep movsb
     inc byte [counter]
+    mov byte [mode],4
     jmp .loop
 
 .cpy_age_doc:
@@ -344,20 +348,23 @@ _display:; apparently this is the equivalent of a switch
     push rbp
     mov  rbp, rsp;and these are called prologue ,gotta be at the top of every fonction
     
-    mov al,[counter]
-    cmp al,1
-    je .adocid
-
-    cmp al,2
-    je .adocnam
-    
-    cmp al,3
-    je .adocg
-
-    mov al,[input]
+    mov al,[mode]
+    cmp al,0
+    je .cas0
 
     cmp al,1
     je .cas1
+    
+    cmp al,2
+    je .cas2
+
+    cmp al,3
+    je .cas3
+
+    cmp al,4
+    je .cas4
+
+    
 
     
 
@@ -382,7 +389,7 @@ jmp .default
     jmp .end_switch
     
 
-.adocid:
+.cas2:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_add_id]
@@ -390,14 +397,14 @@ jmp .default
     syscall
     jmp .end_switch
 
-.adocnam:
+.cas3:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_add_name]
     mov rdx,docnam_menu_len
     syscall
     jmp .end_switch
-.adocg:
+.cas4:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_add_age]
