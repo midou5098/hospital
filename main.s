@@ -5,6 +5,7 @@ struc doctor
     .id resd 1
     .name resb 64
     .age resd 1
+    alignb 8
 endstruc
 section .rodata
 menu:
@@ -59,7 +60,7 @@ vec_len resq 1
 vec_cap resq 1
 input resb 256
 
-mode resb 0
+mode resb 1
 
 
 
@@ -96,27 +97,44 @@ _start:
     xor rdi,rdi
     mov rsi,doctor_size*8;her ethe size 
     mov rdx,3 ;i dont actually need it since the data are not that precious but i ll just set it to 3 being read/write
-    mov r10,0x22
-    mov r8,-1
-    mov r9,0
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
     syscall
-    mov [vec_data],rsx
-    mov [vec_cap],8
-    mov [vec_len],0 ; so the [] act like * , without them i d be writing to an daresss
+    mov [vec_data],rax
+    mov qword [vec_cap],8
+    mov qword [vec_len],0 ; so the [] act like * , without them i d be writing to an daresss
+    call _display
+    call read_input
+    mov al,[input]
+    cmp al,'1'
+    je .set_mode1
+    cmp al,'4'
+    je .exit
+.set_mode1:
+    mov byte [mode],1
+    jmp .exit
 
 
+
+
+.exit:
+    mov rax,60
+    xor rdi,rdi
+    syscall
 
 read_input:
     push rbp
     mov rbp,rsp
     mov rax,0
     mov rdi,0
-    mov rsi,input
+    lea rsi,[input] ,;so i need to use lea to pass adresses
     mov rdx,256
     syscall
     leave
     ret
 
+    
 
 
 
@@ -132,10 +150,8 @@ read_input:
 
 
 
-add_doctor:
-    mov rdi,id 
-    mov rsi,name
-    mov rdx,age
+
+
 
 
 
@@ -159,7 +175,7 @@ jmp .default
 .cas0:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    mov rsi,menu
+    lea rsi,[menu]
     mov rdx,menu_len
     syscall
     jmp .end_switch
@@ -168,7 +184,7 @@ jmp .default
 .cas1:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    mov rsi,doc_menu
+    lea rsi,[doc_menu]
     mov rdx,doc_menu_len
     syscall
     jmp .end_switch
@@ -177,7 +193,7 @@ jmp .default
 .cas11:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    mov rsi,doc_add_id
+    lea rsi,[doc_add_id]
     mov rdx,docid_menu_len
     syscall
     jmp .end_switch
@@ -185,7 +201,7 @@ jmp .default
 .default:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    mov rsi,menu
+    lea rsi,[menu]
     mov rdx,menu_len
     syscall
     jmp .end_switch
