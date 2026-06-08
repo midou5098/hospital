@@ -156,6 +156,18 @@ _start:
     lea rsi,[rbx+doctor.name]
     mov rdx,64
     syscall
+
+
+    movzax rax,
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rax,[rbx+doctor.id]
+    call itoa
+    lea rax,itoa_buffer
+    mov rdx,64
+    syscall
+
+
     jmp .loop
 
 
@@ -509,11 +521,16 @@ itoa:
     inc [count]
     cmp rax,0
     jne .loop
-    je .pop
+    lea rdi, [itoa_buffer]  
 .pop:
-    xor rci,rci
     pop rax
+    mov [rdi],al
+    inc rdi
+    dec byte [count]
+    jnz .pop
     
+
+
 
 .done :
     leave 
