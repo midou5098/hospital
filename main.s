@@ -54,18 +54,19 @@ doc_search_id:
     db "enter the doctor id to look for",10
 docsid_len equ $ -doc_search_id
 announ_id:
-    db "the id : ",10
+    db "the id : "
     
-an_id_len equ $ announ_id
+an_id_len equ $ -announ_id
 announ_name:
-    db "the name : ",10
+    db "the name : "
     
 an_name_len equ $ -announ_name
 announ_age:
-    db "the age : ",10
+    db "the age : "
     
 an_age_len equ $ -announ_age
-
+newline     db 10
+newline_len equ $ - newline
 section .bss
 
 vec_data resq 1
@@ -169,25 +170,26 @@ _start:
     mov rdx,an_id_len
     syscall
 
-
-
     movzx rax,dword[rbx+doctor.id]
     call itoa
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    
     lea rsi,[itoa_buffer]
     movzx rdx,byte [itoa_len]
     syscall
 
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
 
 
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rsi,announ_id
-    mov rdx,an_id_len
+    lea rsi,announ_name
+    mov rdx,an_name_len
     syscall
-
 
 
     mov rax,1;a write call
@@ -197,9 +199,37 @@ _start:
     syscall
 
 
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_age
+    mov rdx,an_age_len
+    syscall
+
+
+    movzx rax,dword[rbx+doctor.age]
+    call itoa
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[itoa_buffer]
+    movzx rdx,byte [itoa_len]
+    syscall
+
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
     
 
-
+    mov [mode],0
     jmp .loop
 
 
