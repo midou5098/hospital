@@ -141,6 +141,64 @@ _start:
     je .doc_fill
     cmp al,5
     je .ssearch_h
+    cmp al,6
+    je .delete
+
+.ddelete:
+    xor rcx, rcx 
+    lea rdi,[input]
+    call atoi
+    mov r12d,eax
+    xor rcx,rcx
+    jmp .delete
+.delete:
+    cmp rcx,[vec_len]
+    je .not_found
+    mov rbx,[vec_data]
+    mov rdx,rcx
+    imul rdx,doctor_size
+    add rbx,rdx
+    cmp [rbx+doctor.id],r12d
+    mov rdi,rbx
+    
+    je .delete_mf
+    inc rcx
+    jmp .delete
+.delete_mf:
+;so every push saves the state and every pop ressurects it , hmm
+    cmp rcx,[vec_len]
+    je .ddone
+    lea rsi,[rdi+doctor_size]
+    mov rax,[vec_len]
+    sub rax,rcx
+    dec rax
+    imul rax,doctor_size
+    mov rcx,rax 
+
+    imul rcx,doctor_size
+    rep movsb
+    
+
+.ddone:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,doc_del
+    mov rdx,doc_del_len
+    syscall
+    dec qword [vec_len]
+    
+    mov [mode],0
+    jmp .loop
+
+
+
+
+
+
+
+
+
+
 .ssearch_h:
     xor rcx, rcx 
     lea rdi,[input]
@@ -161,6 +219,11 @@ _start:
     inc rcx
     jmp .search_h
 .not_found:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,not_found
+    mov rdx,not_found_len
+    syscall
     mov [mode],0
     jmp .loop
 .found:
@@ -599,3 +662,8 @@ itoa:
 .done :
     leave 
     ret
+
+
+
+
+delete:
