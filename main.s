@@ -22,13 +22,8 @@ doc_menu:
     db "3) delete doctor",10
     db "4)exit",10
 doc_menu_len equ $ -doc_menu
-nur_menu:
-    db "<=================hospital menu===============>", 10
-    db "1) add nurse" ,10
-    db "2) search nurse",10
-    db "3) elete nurse",10
-    db "4)exit",10
-nur_menu_len equ $ -nur_menu
+
+
 pat_menu:
     db "<=================hospital menu===============>", 10
     db "1) add patient" ,10
@@ -78,6 +73,64 @@ doc_del_len equ $ -doc_del
 not_found:
     db "not found ! ",10
 not_found_len equ $ -not_found
+
+
+
+
+
+
+
+; <===============================================nurse section
+
+nur_menu:
+    db "<=================hospital menu===============>", 10
+    db "1) add nurse" ,10
+    db "2) search nurse",10
+    db "3) elete nurse",10
+    db "4)exit",10
+nur_menu_len equ $ -nur_menu
+
+nur_add_id:
+    db "enter the id ",10
+    
+nurid_menu_len equ $ -nur_add_id
+
+nur_add_name:
+    db "enter the name ",10
+    
+nurnam_menu_len equ $ -nur_add_name
+nur_add_age:
+    db "enter the age ",10
+    
+nurage_menu_len equ $ -nur_add_age
+
+nur_search_id:
+    db "enter the nurse id to look for",10
+nursid_len equ $ -nur_search_id
+
+nur_del:
+    db "nurse deleted !",10
+nur_del_len equ $ -nur_del
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
