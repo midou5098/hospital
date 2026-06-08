@@ -67,6 +67,36 @@ announ_age:
 an_age_len equ $ -announ_age
 newline     db 10
 newline_len equ $ - newline
+
+
+
+
+doc_del:
+    db "doctor deleted !",10
+doc_del_len equ $ -doc_del
+
+not_found:
+    db "not found ! ",10
+not_found_len equ $ -not_found
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 section .bss
 
 vec_data resq 1
@@ -142,7 +172,7 @@ _start:
     cmp al,5
     je .ssearch_h
     cmp al,6
-    je .delete
+    je .ddelete
 
 .ddelete:
     xor rcx, rcx 
@@ -174,8 +204,6 @@ _start:
     dec rax
     imul rax,doctor_size
     mov rcx,rax 
-
-    imul rcx,doctor_size
     rep movsb
     
 
@@ -221,7 +249,7 @@ _start:
 .not_found:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rsi,not_found
+    lea rsi,[not_found]
     mov rdx,not_found_len
     syscall
     mov [mode],0
@@ -359,6 +387,8 @@ _start:
     je .set_mode2
     cmp al,'2'
     je .set_mode5
+    cmp al,'3'
+    je .set_mode6
     cmp al,'4'
     je .set_mode0
     jmp .loop
@@ -375,7 +405,9 @@ _start:
 .set_mode2:
     mov byte [mode],2
     jmp .loop
-
+.set_mode6:
+    mov byte [mode],6
+    jmp .loop
 .set_mode0:
     mov byte [mode],0
     jmp .loop
@@ -537,7 +569,11 @@ _display:; apparently this is the equivalent of a switch
 
     cmp al,4
     je .cas4
+    
     cmp al,5
+    je .cas5
+    
+    cmp al,6
     je .cas5
 
     
@@ -588,6 +624,15 @@ jmp .default
     syscall
     jmp .end_switch
 .cas5:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[doc_search_id]
+    mov rdx,docsid_len
+    syscall
+    jmp .end_switch
+
+
+.cas6:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_search_id]
