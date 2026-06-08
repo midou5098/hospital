@@ -71,11 +71,11 @@ tempage resd 1
 
 counter resb 1;so also , .bss initializes to 0 with every new var created here 
 
-
+count resb 1
 
 old_size resd 1
 
-
+itoa_buffer resb 32
 
 
 
@@ -495,24 +495,25 @@ atoi:
 .done :
     leave 
     ret
-
+    
 
 itoa:
     push rbp
     mov rbp,rsp
-    xor rax,rax
-    xor rcx,rcx
+    mov rcx,10
 .loop:
-    mov cl,[rdi]
-    cmp cl,'0'
-    jl .done
-    cmp cl,'9'
-    jg .done
-    sub cl,'0'
-    imul rax,10
-    add rax,rcx
-    inc rdi
-    jmp .loop
+    xor rdx,rdx
+    div rcx
+    add dl,'0'
+    push rdx
+    inc [count]
+    cmp rax,0
+    jne .loop
+    je .pop
+.pop:
+    xor rci,rci
+    pop rax
+    
 
 .done :
     leave 
