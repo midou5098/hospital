@@ -7,6 +7,21 @@ struc doctor
     .age resd 1
     alignb 8
 endstruc
+
+
+struc nurse
+    .id resd 1
+    .name resb 64
+    .carrer resd 1
+    alignb 8
+endstruc
+
+struc patient
+    .id resd 1
+    .name resb 64
+    .disease resb 64
+    alignb 8
+endstruc
 section .rodata
 menu:
     db "<=================hospital menu===============>",10
@@ -157,6 +172,19 @@ vec_len resq 1
 vec_cap resq 1
 input resb 256
 
+
+nur_vec_data resq 1
+nur_vec_len resq 1
+nur_vec_cap resq 1
+
+
+
+
+
+
+
+
+
 mode resb 1
 
 
@@ -205,9 +233,19 @@ _start:
     mov qword [vec_cap],8
     mov qword [vec_len],0 ; so the [] act like * , without them i d be writing to an daresss
     
-    
+    mov rax,9; this is a call for the mmap, apparently in assembly u do a alert→args→ssycall , interesting
+    xor rdi,rdi
+    mov rsi,nurse_size*8;her ethe size 
+    mov rdx,3 ;i dont actually need it since the data are not that precious but i ll just set it to 3 being read/write
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
+    syscall
+    mov qword [nur_vec_data],rax
+    mov qword [nur_vec_cap],8
+    mov qword [nur_vec_len],0 
 
-
+;aight so its getting a bit big  , so far i have tillm mode 6 full , so here is the new data ,7 for nurses menu , 8 for add id , 9 for add age , 10 for add carrer , 11 for search , and 12 for delete
 .loop:
     call _display
     call read_input
@@ -226,6 +264,8 @@ _start:
     je .ssearch_h
     cmp al,6
     je .ddelete
+    cmp al,7
+    je .nurmenu_handel
 
 .ddelete:
     xor rcx, rcx 
