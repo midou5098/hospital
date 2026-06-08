@@ -53,7 +53,18 @@ docage_menu_len equ $ -doc_add_age
 doc_search_id:
     db "enter the doctor id to look for",10
 docsid_len equ $ -doc_search_id
-
+announ_id:
+    db "the id : ",10
+    
+an_id_len equ $ announ_id
+announ_name:
+    db "the name : ",10
+    
+an_name_len equ $ -announ_name
+announ_age:
+    db "the age : ",10
+    
+an_age_len equ $ -announ_age
 
 section .bss
 
@@ -77,6 +88,7 @@ old_size resd 1
 
 itoa_buffer resb 32
 
+itoa_len    resb 1
 
 
 
@@ -153,19 +165,39 @@ _start:
 .found:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_id
+    mov rdx,an_id_len
+    syscall
+
+
+
+    movzx rax,dword[rbx+doctor.id]
+    call itoa
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    
+    lea rsi,[itoa_buffer]
+    movzx rdx,byte [itoa_len]
+    syscall
+
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_id
+    mov rdx,an_id_len
+    syscall
+
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[rbx+doctor.name]
     mov rdx,64
     syscall
 
 
-    movzax rax,
-    mov rax,1;a write call
-    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rax,[rbx+doctor.id]
-    call itoa
-    lea rax,itoa_buffer
-    mov rdx,64
-    syscall
+    
 
 
     jmp .loop
@@ -518,9 +550,11 @@ itoa:
     div rcx
     add dl,'0'
     push rdx
-    inc [count]
+    inc byte [count]
     cmp rax,0
     jne .loop
+    mov  al, [count]
+    mov  [itoa_len], al
     lea rdi, [itoa_buffer]  
 .pop:
     pop rax
