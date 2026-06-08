@@ -477,6 +477,45 @@ _start:
 .docmenu_handel:
     mov al,[input]
     cmp al,'1'
+    je .set_mode8
+    cmp al,'2'
+    je .set_mode9
+    cmp al,'3'
+    je .set_mode10
+    cmp al,'4'
+    je .set_mode0
+    jmp .loop
+
+
+.set_mode8:
+    mov byte [mode],8
+    jmp .loop
+.set_mode9:
+    mov byte [mode],9
+    jmp .loop
+.set_mode10:
+    mov byte [mode],10
+    jmp .loop
+.set_mode0:
+    mov byte [mode],0
+    jmp .loop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.docmenu_handel:
+    mov al,[input]
+    cmp al,'1'
     je .set_mode2
     cmp al,'2'
     je .set_mode5
