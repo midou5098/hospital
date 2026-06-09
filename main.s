@@ -304,18 +304,7 @@ _start:
     je .ssearch_hn
     cmp al,12
     je .ddeleten
-    cmp al,13
-    je .patmenu_handel
-    cmp al,14
-    je .pat_fill
-    cmp al,15
-    je .pat_fill
-    cmp al,16
-    je .pat_fill
-    cmp al,17
-    je .ssearch_hp
-    cmp al,18
-    je .ddeletep
+
 
 .ddelete:
     xor rcx, rcx 
@@ -732,6 +721,8 @@ _start:
     je .set_mode1
     cmp al,'2'
     je .set_mode7
+    cmp al,'3'
+    je .set_mode13
     
     jmp .loop
 
@@ -766,6 +757,9 @@ _start:
 
 .set_mode12:
     mov byte [mode],12
+    jmp .loop
+.set_mode13:
+    mov byte [mode],13
     jmp .loop
 .set_mode0:
     mov byte [mode],0
@@ -1032,7 +1026,6 @@ push_nur:
 
 
 
-
 read_input:
     push rbp
     mov rbp,rsp
@@ -1105,7 +1098,9 @@ _display:; apparently this is the equivalent of a switch
     cmp al,11
     je .cas11
     cmp al,12
-    je .cas11
+    je .cas12
+    cmp al,13
+    je .cas13
 
 
     
@@ -1210,7 +1205,7 @@ jmp .default
     mov rdx,docsid_len
     syscall
     jmp .end_switch
-.case12:
+.cas12:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_search_id]
@@ -1218,7 +1213,13 @@ jmp .default
     syscall
     jmp .end_switch
 
-
+.cas13:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[pat_menu]
+    mov rdx,pat_menu_len
+    syscall
+    jmp .end_switch
 .default:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
