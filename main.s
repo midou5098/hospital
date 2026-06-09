@@ -108,16 +108,16 @@ nur_menu_len equ $ -nur_menu
 nur_add_id:
     db "enter the id ",10
     
-nurid_menu_len equ $ -nur_add_id
+nuradd_id_len equ $ -nur_add_id
 
 nur_add_name:
     db "enter the name ",10
     
-nurnam_menu_len equ $ -nur_add_name
-nur_add_age:
-    db "enter the age ",10
+nuradd_name_len equ $ -nur_add_name
+nur_add_car:
+    db "enter the carrer ",10
     
-nurage_menu_len equ $ -nur_add_age
+nuradd_car_len equ $ -nur_add_car
 
 nur_search_id:
     db "enter the nurse id to look for",10
@@ -483,9 +483,9 @@ _start:
     cmp al,'1'
     je .set_mode8
     cmp al,'2'
-    je .set_mode9
+    je .set_mode11
     cmp al,'3'
-    je .set_mode10
+    je .set_mode12
     cmp al,'4'
     je .set_mode0
     jmp .loop
@@ -712,6 +712,15 @@ _display:; apparently this is the equivalent of a switch
 
     cmp al,7
     je .cas7
+    
+    cmp al,8
+    je .cas7
+    
+    cmp al,9
+    je .cas7
+
+    cmp al,10
+    je .cas7
 
 
     
@@ -787,10 +796,28 @@ jmp .default
     jmp .end_switch
 
 
+.cas8:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[nur_add_id]
+    mov rdx,nuradd_id_len
+    syscall
+    jmp .end_switch
 
-
-
-
+.cas9:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[nur_add_name]
+    mov rdx,nuradd_name_len
+    syscall
+    jmp .end_switch
+.cas10:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[nur_add_car]
+    mov rdx,nuradd_car_len
+    syscall
+    jmp .end_switch
 
 
 
