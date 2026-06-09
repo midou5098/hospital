@@ -39,13 +39,7 @@ doc_menu:
 doc_menu_len equ $ -doc_menu
 
 
-pat_menu:
-    db "<=================hospital menu===============>", 10
-    db "1) add patient" ,10
-    db "2) search patient",10
-    db "3) delete patient",10
-    db "4)exit",10
-pat_menu_len equ $ -pat_menu
+
 
 doc_add_id:
     db "enter the id ",10
@@ -141,8 +135,30 @@ nur_del_len equ $ -nur_del
 
 
 
+;<============================== patient menu =============================
+
+pat_menu:
+    db "<=================hospital menu===============>", 10
+    db "1) add patient" ,10
+    db "2) search patient",10
+    db "3) delete patient",10
+    db "4)exit",10
+pat_menu_len equ $ -pat_menu
 
 
+pat_add_id:
+    db "enter the id ",10
+    
+patadd_id_len equ $ -pat_add_id
+
+pat_add_name:
+    db "enter the name ",10
+    
+patadd_name_len equ $ -pat_add_name
+pat_add_dis:
+    db "enter the disease  ",10
+    
+patadd_dis_len equ $ -pat_add_dis
 
 
 
