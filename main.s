@@ -61,7 +61,7 @@ doc_add_age:
     
 docage_menu_len equ $ -doc_add_age
 doc_search_id:
-    db "enter the doctor id to look for",10
+    db "enter the id to look for",10
 docsid_len equ $ -doc_search_id
 announ_id:
     db "the id : "
@@ -75,6 +75,13 @@ announ_age:
     db "the age : "
     
 an_age_len equ $ -announ_age
+announ_car:
+    db "the carrer : "
+    
+an_car_len equ $ -announ_car
+
+
+
 newline     db 10
 newline_len equ $ - newline
 
@@ -276,7 +283,7 @@ _start:
     cmp al,10
     je .nur_fill
     cmp al,11
-    je .ssearch_h
+    je .ssearch_hn
 .ddelete:
     xor rcx, rcx 
     lea rdi,[input]
@@ -325,41 +332,34 @@ _start:
 
 
 
-.ssearch_h:
+.ssearch_hn:
     xor rcx, rcx 
     lea rdi,[input]
     call atoi
     xor rcx,rcx
-    jmp .search_h
+    jmp .search_hn
 
-.search_h:
-    cmp rcx,[vec_len]
+.search_hn:
+    cmp rcx,[nur_vec_len]
     je .not_found
     
-    mov rbx,[vec_data]
+    mov rbx,[nur_vec_data]
     mov rdx,rcx
-    imul rdx,doctor_size
+    imul rdx,nurse_size
     add rbx,rdx
-    cmp [rbx+doctor.id],eax
-    je .found
+    cmp [rbx+nurse.id],eax
+    je .foundn
     inc rcx
-    jmp .search_h
-.not_found:
-    mov rax,1;a write call
-    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rsi,[not_found]
-    mov rdx,not_found_len
-    syscall
-    mov [mode],0
-    jmp .loop
-.found:
+    jmp .search_hn
+
+.foundn:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,announ_id
     mov rdx,an_id_len
     syscall
 
-    movzx rax,dword[rbx+doctor.id]
+    movzx rax,dword[rbx+nurse.id]
     call itoa
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
@@ -383,7 +383,7 @@ _start:
 
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rsi,[rbx+doctor.name]
+    lea rsi,[rbx+nurse.name]
     mov rdx,64
     syscall
 
@@ -397,17 +397,14 @@ _start:
 
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rsi,announ_age
-    mov rdx,an_age_len
+    lea rsi,announ_car
+    mov rdx,an_car_len
     syscall
 
-
-    movzx rax,dword[rbx+doctor.age]
-    call itoa
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rsi,[itoa_buffer]
-    movzx rdx,byte [itoa_len]
+    lea rsi,[rbx+nurse.carrer]
+    mov rdx,64
     syscall
 
     mov rax, 1
@@ -1015,6 +1012,8 @@ _display:; apparently this is the equivalent of a switch
 
     cmp al,10
     je .cas10
+    cmp al,11
+    je .cas11
 
 
     
@@ -1110,6 +1109,13 @@ jmp .default
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[nur_add_car]
     mov rdx,nuradd_car_len
+    syscall
+    jmp .end_switch
+.cas11:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[doc_search_id]
+    mov rdx,docsid_len
     syscall
     jmp .end_switch
 
