@@ -377,7 +377,7 @@ _start:
     lea rsi,nur_del
     mov rdx,nur_del_len
     syscall
-    dec qword [vec_len]
+    dec qword [nur_vec_len]
     
     mov [mode],0
     jmp .loop
