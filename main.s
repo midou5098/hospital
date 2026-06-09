@@ -270,8 +270,11 @@ _start:
     cmp al,7
     je .nurmenu_handel
     cmp al,8
-    je .
-
+    je .nur_fill
+    cmp al,9
+    je .nur_fill
+    cmp al,10
+    je .nur_fill
 .ddelete:
     xor rcx, rcx 
     lea rdi,[input]
@@ -431,6 +434,7 @@ _start:
     je .cpy_name_doc
     cmp al,2
     je .cpy_age_doc
+    jmp .loop
 
 .nur_fill:
     mov al,[counter]
@@ -446,7 +450,7 @@ _start:
     call atoi
     mov [tempnurid],eax;eax is the lower 32 bits , 
     inc byte [counter]
-    mov byte [mode],3
+    mov byte [mode],9
     jmp .loop
 .cpy_name_nur:
     lea rsi,[input]
@@ -454,7 +458,7 @@ _start:
     mov rcx, 64
     rep movsb
     inc byte [counter]
-    mov byte [mode],4
+    mov byte [mode],10
     jmp .loop
 .cpy_carrer_nur:
     lea rsi,[input]
@@ -462,7 +466,9 @@ _start:
     mov rcx, 64
     rep movsb
     inc byte [counter]
-    mov byte [mode],4
+    mov byte [mode],7
+    call push_nur
+    jmp .set_mode0
     jmp .loop
 
 
@@ -601,37 +607,6 @@ push_doc:
     inc qword [vec_len]
     leave
     ret 
-push_nur:
-    push rbp
-    mov  rbp, rsp
-    mov rax,[nur_vec_cap]
-    cmp rax,[nur_vec_len]
-    jg .affect_nur
-    je .expand
-    inc qword [nur_vec_len]
-    leave
-    ret 
-
-.affect_nur:
-    mov rbx,[nur_vec_data]
-    mov rax,[nur_vec_len]
-    imul rax,nurse_size
-    add rbx,rax
-    mov eax,[tempnurid]
-    mov [rbx+nurse.id],eax
-    lea rsi,[tempnurname]
-    lea rdi,[rbx+nurse.name]
-    mov rcx,64
-    rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
-    mov eax,[tempcar]
-    mov [rbx+nurse.carrer],eax
-    inc qword [nur_vec_len]
-    mov [mode],1
-    leave
-    ret 
-
-
-
 
 
 
@@ -653,57 +628,6 @@ push_nur:
     mov [mode],1
     leave
     ret 
-
-
-
-.expand_nur:
-    push rbx
-    push r12
-    mov r12,[nur_vec_data]
-    mov rbx , [nur_vec_cap]
-    
-    
-    mov rax,9
-    xor rdi,rdi
-    mov rsi,[nur_vec_cap]
-    shl rsi,1
-    imul rsi,nurse_size
-    mov rdx,3
-    mov r10d,0x22
-    mov r8d,-1
-    mov r9d,0
-    syscall
-
-
-
-   
-    mov rdi,rax
-    mov rsi,r12
-    mov rcx,[nur_vec_len]
-    imul rcx,nurse_size
-    rep movsb
-
-    push rax
-    mov rdi,r12
-    imul rbx,doctor_size
-    mov rsi,rbx
-    mov rax,11
-    syscall
-    pop rax
-
-    mov [vec_data],rax
-    shl qword [vec_cap],1
-    pop r12
-    pop rbx
-    jmp .affect
-
-
-
-;.copy:
- ;   imul rcx,doctor_size
-  ;  lea rsi,[vec_data+rcx]
-   ; lea rsd,[rdi+rcx]
-
 
 
 
@@ -786,6 +710,88 @@ push_nur:
 
 
 
+
+
+push_nur:
+    push rbp
+    mov  rbp, rsp
+    mov rax,[nur_vec_cap]
+    cmp rax,[nur_vec_len]
+    jg .affect_nur
+    je .expand_nur
+    inc qword [nur_vec_len]
+    leave
+    ret 
+
+.affect_nur:
+    mov rbx,[nur_vec_data]
+    mov rax,[nur_vec_len]
+    imul rax,nurse_size
+    add rbx,rax
+    mov eax,[tempnurid]
+    mov [rbx+nurse.id],eax
+    lea rsi,[tempnurname]
+    lea rdi,[rbx+nurse.name]
+    mov rcx,64
+    rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
+    mov eax,[tempcar]
+    mov [rbx+nurse.carrer],eax
+    inc qword [nur_vec_len]
+    mov [mode],1
+    leave
+    ret 
+
+
+
+
+
+.expand_nur:
+    push rbx
+    push r12
+    mov r12,[nur_vec_data]
+    mov rbx , [nur_vec_cap]
+    
+    
+    mov rax,9
+    xor rdi,rdi
+    mov rsi,[nur_vec_cap]
+    shl rsi,1
+    imul rsi,nurse_size
+    mov rdx,3
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
+    syscall
+
+
+
+   
+    mov rdi,rax
+    mov rsi,r12
+    mov rcx,[nur_vec_len]
+    imul rcx,nurse_size
+    rep movsb
+
+    push rax
+    mov rdi,r12
+    imul rbx,nurse_size
+    mov rsi,rbx
+    mov rax,11
+    syscall
+    pop rax
+
+    mov [nur_vec_data],rax
+    shl qword [nur_vec_cap],1
+    pop r12
+    pop rbx
+    jmp .affect_nur
+
+
+
+;.copy:
+ ;   imul rcx,doctor_size
+  ;  lea rsi,[vec_data+rcx]
+   ; lea rsd,[rdi+rcx]
 
 
 
