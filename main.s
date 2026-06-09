@@ -92,6 +92,8 @@ doc_del:
     db "doctor deleted !",10
 doc_del_len equ $ -doc_del
 
+
+
 not_found:
     db "not found ! ",10
 not_found_len equ $ -not_found
@@ -284,6 +286,8 @@ _start:
     je .nur_fill
     cmp al,11
     je .ssearch_hn
+    cmp al,12
+    je .ddeleten
 .ddelete:
     xor rcx, rcx 
     lea rdi,[input]
@@ -327,6 +331,63 @@ _start:
     
     mov [mode],0
     jmp .loop
+
+
+
+
+
+
+
+.ddeleten:
+    xor rcx, rcx 
+    lea rdi,[input]
+    call atoi
+    mov r12d,eax
+    xor rcx,rcx
+    jmp .deleten
+.deleten:
+    cmp rcx,[nur_vec_len]
+    je .not_found
+    mov rbx,[nur_vec_data]
+    mov rdx,rcx
+    imul rdx,nurse_size
+    add rbx,rdx
+    cmp [rbx+nurse.id],r12d
+    mov rdi,rbx
+    
+    je .delete_mfn
+    inc rcx
+    jmp .deleten
+.delete_mfn:
+;so every push saves the state and every pop ressurects it , hmm
+    cmp rcx,[nur_vec_len]
+    je .ddonen
+    lea rsi,[rdi+nurse_size]
+    mov rax,[nur_vec_len]
+    sub rax,rcx
+    dec rax
+    imul rax,nurse_size
+    mov rcx,rax 
+    rep movsb
+    
+
+.ddonen:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,nur_del
+    mov rdx,nur_del_len
+    syscall
+    dec qword [vec_len]
+    
+    mov [mode],0
+    jmp .loop
+
+
+
+
+
+
+
 
 
 
@@ -1014,6 +1075,8 @@ _display:; apparently this is the equivalent of a switch
     je .cas10
     cmp al,11
     je .cas11
+    cmp al,12
+    je .cas11
 
 
     
@@ -1112,6 +1175,13 @@ jmp .default
     syscall
     jmp .end_switch
 .cas11:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[doc_search_id]
+    mov rdx,docsid_len
+    syscall
+    jmp .end_switch
+.case12:
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[doc_search_id]
