@@ -192,6 +192,9 @@ tempid resd 1
 tempname resb 64
 tempage resd 1
 
+tempnurid resd 1
+tempnurname resb 64
+tempcar resd 1
 counter resb 1;so also , .bss initializes to 0 with every new var created here 
 
 count resb 1
@@ -598,6 +601,39 @@ push_doc:
     inc qword [vec_len]
     leave
     ret 
+push_nur:
+    push rbp
+    mov  rbp, rsp
+    mov rax,[nur_vec_cap]
+    cmp rax,[nur_vec_len]
+    jg .affect_nur
+    je .expand
+    inc qword [nur_vec_len]
+    leave
+    ret 
+
+.affect_nur:
+    mov rbx,[nur_vec_data]
+    mov rax,[nur_vec_len]
+    imul rax,nurse_size
+    add rbx,rax
+    mov eax,[tempnurid]
+    mov [rbx+nurse.id],eax
+    lea rsi,[tempnurname]
+    lea rdi,[rbx+nurse.name]
+    mov rcx,64
+    rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
+    mov eax,[tempcar]
+    mov [rbx+nurse.carrer],eax
+    inc qword [nur_vec_len]
+    mov [mode],1
+    leave
+    ret 
+
+
+
+
+
 
 
 .affect:
@@ -617,6 +653,87 @@ push_doc:
     mov [mode],1
     leave
     ret 
+
+
+
+.expand_nur:
+    push rbx
+    push r12
+    mov r12,[nur_vec_data]
+    mov rbx , [nur_vec_cap]
+    
+    
+    mov rax,9
+    xor rdi,rdi
+    mov rsi,[nur_vec_cap]
+    shl rsi,1
+    imul rsi,nurse_size
+    mov rdx,3
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
+    syscall
+
+
+
+   
+    mov rdi,rax
+    mov rsi,r12
+    mov rcx,[nur_vec_len]
+    imul rcx,nurse_size
+    rep movsb
+
+    push rax
+    mov rdi,r12
+    imul rbx,doctor_size
+    mov rsi,rbx
+    mov rax,11
+    syscall
+    pop rax
+
+    mov [vec_data],rax
+    shl qword [vec_cap],1
+    pop r12
+    pop rbx
+    jmp .affect
+
+
+
+;.copy:
+ ;   imul rcx,doctor_size
+  ;  lea rsi,[vec_data+rcx]
+   ; lea rsd,[rdi+rcx]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .expand:
     push rbx
