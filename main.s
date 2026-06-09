@@ -266,6 +266,8 @@ _start:
     je .ddelete
     cmp al,7
     je .nurmenu_handel
+    cmp al,8
+    je .
 
 .ddelete:
     xor rcx, rcx 
@@ -427,9 +429,38 @@ _start:
     cmp al,2
     je .cpy_age_doc
 
+.nur_fill:
+    mov al,[counter]
+    cmp al,0
+    je .cpy_id_nur
+    cmp al,1
+    je .cpy_name_nur
+    cmp al,2
+    je .cpy_carrer_nur
 
-
-
+.cpy_id_nur:
+    lea rdi,[input]
+    call atoi
+    mov [tempnurid],eax;eax is the lower 32 bits , 
+    inc byte [counter]
+    mov byte [mode],3
+    jmp .loop
+.cpy_name_nur:
+    lea rsi,[input]
+    lea rdi,[tempnurname]
+    mov rcx, 64
+    rep movsb
+    inc byte [counter]
+    mov byte [mode],4
+    jmp .loop
+.cpy_carrer_nur:
+    lea rsi,[input]
+    lea rdi,[tempcar]
+    mov rcx, 64
+    rep movsb
+    inc byte [counter]
+    mov byte [mode],4
+    jmp .loop
 
 
 .cpy_id_doc:
@@ -499,6 +530,13 @@ _start:
     jmp .loop
 .set_mode10:
     mov byte [mode],10
+    jmp .loop
+.set_mode11:
+    mov byte [mode],11
+    jmp .loop
+
+.set_mode12:
+    mov byte [mode],12
     jmp .loop
 .set_mode0:
     mov byte [mode],0
@@ -714,13 +752,13 @@ _display:; apparently this is the equivalent of a switch
     je .cas7
     
     cmp al,8
-    je .cas7
+    je .cas8
     
     cmp al,9
-    je .cas7
+    je .cas9
 
     cmp al,10
-    je .cas7
+    je .cas10
 
 
     
@@ -818,7 +856,6 @@ jmp .default
     mov rdx,nuradd_car_len
     syscall
     jmp .end_switch
-
 
 
 .default:
