@@ -304,6 +304,19 @@ _start:
     je .ssearch_hn
     cmp al,12
     je .ddeleten
+    cmp al,13
+    je .patmenu_handel
+    cmp al,14
+    je .pat_fill
+    cmp al,15
+    je .pat_fill
+    cmp al,16
+    je .pat_fill
+    cmp al,17
+    je .ssearch_hp
+    cmp al,18
+    je .ddeletep
+
 .ddelete:
     xor rcx, rcx 
     lea rdi,[input]
