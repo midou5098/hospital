@@ -275,6 +275,8 @@ _start:
     je .nur_fill
     cmp al,10
     je .nur_fill
+    cmp al,11
+    je .ssearch_h
 .ddelete:
     xor rcx, rcx 
     lea rdi,[input]
@@ -318,6 +320,137 @@ _start:
     
     mov [mode],0
     jmp .loop
+
+
+
+
+
+.ssearch_h:
+    xor rcx, rcx 
+    lea rdi,[input]
+    call atoi
+    xor rcx,rcx
+    jmp .search_h
+
+.search_h:
+    cmp rcx,[vec_len]
+    je .not_found
+    
+    mov rbx,[vec_data]
+    mov rdx,rcx
+    imul rdx,doctor_size
+    add rbx,rdx
+    cmp [rbx+doctor.id],eax
+    je .found
+    inc rcx
+    jmp .search_h
+.not_found:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[not_found]
+    mov rdx,not_found_len
+    syscall
+    mov [mode],0
+    jmp .loop
+.found:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_id
+    mov rdx,an_id_len
+    syscall
+
+    movzx rax,dword[rbx+doctor.id]
+    call itoa
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[itoa_buffer]
+    movzx rdx,byte [itoa_len]
+    syscall
+
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_name
+    mov rdx,an_name_len
+    syscall
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[rbx+doctor.name]
+    mov rdx,64
+    syscall
+
+
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_age
+    mov rdx,an_age_len
+    syscall
+
+
+    movzx rax,dword[rbx+doctor.age]
+    call itoa
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[itoa_buffer]
+    movzx rdx,byte [itoa_len]
+    syscall
+
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
+    
+
+    mov [mode],0
+    jmp .loop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
