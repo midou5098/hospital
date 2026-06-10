@@ -92,7 +92,9 @@ not_found:
     db "not found ! ",10
 not_found_len equ $ -not_found
 
-
+added:
+    db "added ! ",10
+added_len equ $ -added
 
 
 
@@ -331,6 +333,10 @@ _start:
     je .pat_fill
     cmp al,16
     je .pat_fill
+    cmp al,17
+    je .ssearch_hp
+    cmp al,18
+    je .ddeletep
 
 
 
@@ -431,6 +437,94 @@ _start:
 
 
 
+
+
+
+.ssearch_hp:
+    xor rcx, rcx 
+    lea rdi,[input]
+    call atoi
+    xor rcx,rcx
+    jmp .search_hp
+
+.search_hp:
+    cmp rcx,[pat_vec_len]
+    je .not_found
+    
+    mov rbx,[pat_vec_data]
+    mov rdx,rcx
+    imul rdx,patient_size
+    add rbx,rdx
+    cmp [rbx+patient.id],eax
+    je .foundp
+    inc rcx
+    jmp .search_hp
+
+.foundp:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_id
+    mov rdx,an_id_len
+    syscall
+
+    movzx rax,dword[rbx+patient.id]
+    call itoa
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[itoa_buffer]
+    movzx rdx,byte [itoa_len]
+    syscall
+
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_name
+    mov rdx,an_name_len
+    syscall
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[rbx+nurse.name]
+    mov rdx,64
+    syscall
+
+
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,announ_dis
+    mov rdx,an_dis_len
+    syscall
+
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[rbx+patient.disease]
+    mov rdx,64
+    syscall
+
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [newline]
+    mov rdx, 1
+    syscall
+
+    
+
+    mov [mode],0
+    jmp .loop
 
 
 
@@ -725,7 +819,7 @@ _start:
     call atoi
     mov [temppatid],eax;eax is the lower 32 bits , 
     inc byte [counter]
-    mov byte [mode],9
+    mov byte [mode],15
     jmp .loop
 .cpy_name_pat:
     lea rsi,[input]
@@ -733,7 +827,7 @@ _start:
     mov rcx, 64
     rep movsb
     inc byte [counter]
-    mov byte [mode],10
+    mov byte [mode],16
     jmp .loop
 .cpy_dis_pat:
     lea rsi,[input]
@@ -741,7 +835,7 @@ _start:
     mov rcx, 64
     rep movsb
     inc byte [counter]
-    mov byte [mode],7
+    mov byte [mode],0
     call push_pat
     jmp .set_mode0
     jmp .loop
