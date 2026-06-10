@@ -42,16 +42,16 @@ doc_menu_len equ $ -doc_menu
 
 
 doc_add_id:
-    db "enter the id ",10
+    db "enter the id :",10
     
 docid_menu_len equ $ -doc_add_id
 
 doc_add_name:
-    db "enter the name ",10
+    db "enter the name :",10
     
 docnam_menu_len equ $ -doc_add_name
 doc_add_age:
-    db "enter the age ",10
+    db "enter the age :",10
     
 docage_menu_len equ $ -doc_add_age
 doc_search_id:
@@ -111,16 +111,16 @@ nur_menu:
 nur_menu_len equ $ -nur_menu
 
 nur_add_id:
-    db "enter the id ",10
+    db "enter the id : ",10
     
 nuradd_id_len equ $ -nur_add_id
 
 nur_add_name:
-    db "enter the name ",10
+    db "enter the name : ",10
     
 nuradd_name_len equ $ -nur_add_name
 nur_add_car:
-    db "enter the carrer ",10
+    db "enter the carrer : ",10
     
 nuradd_car_len equ $ -nur_add_car
 
@@ -149,22 +149,24 @@ pat_menu_len equ $ -pat_menu
 
 
 pat_add_id:
-    db "enter the id ",10
+    db "enter the id : ",10
     
 patadd_id_len equ $ -pat_add_id
 
 pat_add_name:
-    db "enter the name ",10
+    db "enter the name : ",10
     
 patadd_name_len equ $ -pat_add_name
 pat_add_dis:
-    db "enter the disease  ",10
+    db "enter the disease : ",10
     
 patadd_dis_len equ $ -pat_add_dis
 
 
 
-
+announ_dis:
+    db "disease : "
+an_dis_len equ $ -announ_dis
 
 
 
@@ -335,8 +337,7 @@ _start:
     je .pat_fill
     cmp al,17
     je .ssearch_hp
-    cmp al,18
-    je .ddeletep
+
 
 
 
@@ -491,7 +492,7 @@ _start:
 
     mov rax,1;a write call
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
-    lea rsi,[rbx+nurse.name]
+    lea rsi,[rbx+patient.name]
     mov rdx,64
     syscall
 
@@ -945,20 +946,20 @@ _start:
     cmp al,'1'
     je .set_mode14
     cmp al,'2'
-    je .set_mode15
+    je .set_mode17
     cmp al,'3'
-    je .set_mode16
+    je .set_mode18
     cmp al,'4'
     je .set_mode0
     jmp .loop
 .set_mode14:
     mov byte [mode],14
     jmp .loop
-.set_mode15:
-    mov byte [mode],15
+.set_mode17:
+    mov byte [mode],17
     jmp .loop
-.set_mode16:
-    mov byte [mode],16
+.set_mode18:
+    mov byte [mode],18
     jmp .loop
 
 
@@ -1393,6 +1394,10 @@ _display:; apparently this is the equivalent of a switch
     je .cas15
     cmp al,16
     je .cas16
+    cmp al,17
+    je .cas5
+    cmp al,18
+    je .cas6
 
 
     
