@@ -12,7 +12,7 @@ endstruc
 struc nurse
     .id resd 1
     .name resb 64
-    .carrer resd 1
+    .carrer resb 64
     alignb 8
 endstruc
 
@@ -106,7 +106,7 @@ nur_menu:
     db "<=================hospital menu===============>", 10
     db "1) add nurse" ,10
     db "2) search nurse",10
-    db "3) elete nurse",10
+    db "3) delete nurse",10
     db "4)exit",10
 nur_menu_len equ $ -nur_menu
 
@@ -965,6 +965,7 @@ _start:
 
 .set_mode8:
     mov byte [mode],8
+    mov byte [counter],0
     jmp .loop
 .set_mode9:
     mov byte [mode],9
@@ -1002,6 +1003,7 @@ _start:
     jmp .loop
 .set_mode14:
     mov byte [mode],14
+    mov byte [counter],0
     jmp .loop
 .set_mode17:
     mov byte [mode],17
@@ -1040,6 +1042,7 @@ _start:
     jmp .loop
 .set_mode2:
     mov byte [mode],2
+    mov byte [counter],0
     jmp .loop
 .set_mode6:
     mov byte [mode],6
