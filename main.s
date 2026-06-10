@@ -273,6 +273,18 @@ _start:
     mov qword [nur_vec_cap],8
     mov qword [nur_vec_len],0 
 
+    mov rax,9; this is a call for the mmap, apparently in assembly u do a alert→args→ssycall , interesting
+    xor rdi,rdi
+    mov rsi,patient_size*8;her ethe size 
+    mov rdx,3 ;i dont actually need it since the data are not that precious but i ll just set it to 3 being read/write
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
+    syscall
+    mov qword [pat_vec_data],rax
+    mov qword [pat_vec_cap],8
+    mov qword [pat_vec_len],0 
+
 ;aight so its getting a bit big  , so far i have tillm mode 6 full , so here is the new data ,7 for nurses menu , 8 for add id , 9 for add age , 10 for add carrer , 11 for search , and 12 for delete
 .loop:
     call _display
@@ -304,6 +316,15 @@ _start:
     je .ssearch_hn
     cmp al,12
     je .ddeleten
+    cmp al,13
+    je .patmenu_handel
+    cmp al,14
+    je pat_fill
+    cmp al,15
+    je pat_fill
+    cmp al,16
+    je pat_fill
+
 
 
 .ddelete:
@@ -645,6 +666,15 @@ _start:
     je .cpy_age_doc
     jmp .loop
 
+.pat_fill:
+    mov al,[counter]
+    cmp al,0
+    je .cpy_id_pat
+    cmp al,1
+    je .cpy_name_pat
+    cmp al,2
+    je .cpy_age_pat
+    jmp .loop
 .nur_fill:
     mov al,[counter]
     cmp al,0
@@ -723,6 +753,8 @@ _start:
     je .set_mode7
     cmp al,'3'
     je .set_mode13
+    cmp al,'4'
+    je .exit
     
     jmp .loop
 
@@ -768,8 +800,26 @@ _start:
 
 
 
-
-
+.patmenu_handel:
+    mov al,[input]
+    cmp al,'1'
+    je .set_mode14
+    cmp al,'2'
+    je .set_mode15
+    cmp al,'3'
+    je .set_mode16
+    cmp al,'4'
+    je .set_mode0
+    jmp .loop
+.set_mode14:
+    mov byte [mode],14
+    jmp .loop
+.set_mode15:
+    mov byte [mode],15
+    jmp .loop
+.set_mode16:
+    mov byte [mode],16
+    jmp .loop
 
 
 
@@ -811,6 +861,22 @@ _start:
     mov rax,60
     xor rdi,rdi
     syscall
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 push_doc:
     push rbp
     mov  rbp, rsp
@@ -1010,8 +1076,19 @@ push_nur:
 
 
 
+push_pat:
+    push rbp
+    mov  rbp, rsp
+    mov rax,[pat_vec_cap]
+    cmp rax,[pat_vec_len]
+    jg .affectp
+    je .expandp
+    inc qword [pat_vec_len]
+    leave
+    ret 
 
 
+.affectp:
 
 
 
@@ -1101,6 +1178,12 @@ _display:; apparently this is the equivalent of a switch
     je .cas12
     cmp al,13
     je .cas13
+    cmp al,14
+    je .cas14
+    cmp al,15
+    je .cas15
+    cmp al,16
+    je .cas16
 
 
     
@@ -1218,6 +1301,27 @@ jmp .default
     mov rdi,1; serves as "set mode to std::out as there is also a file mode"
     lea rsi,[pat_menu]
     mov rdx,pat_menu_len
+    syscall
+    jmp .end_switch
+.cas14:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[pat_add_id]
+    mov rdx,patadd_id_len
+    syscall
+    jmp .end_switch
+.cas15:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[pat_add_name]
+    mov rdx,patadd_name_len
+    syscall
+    jmp .end_switch
+.cas16:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,[pat_add_dis]
+    mov rdx,patadd_dis_len
     syscall
     jmp .end_switch
 .default:
