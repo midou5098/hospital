@@ -203,7 +203,9 @@ nur_vec_len resq 1
 nur_vec_cap resq 1
 
 
-
+pat_vec_data resq 1
+pat_vec_len resq 1
+pat_vec_cap resq 1
 
 
 
@@ -220,6 +222,11 @@ tempage resd 1
 tempnurid resd 1
 tempnurname resb 64
 tempcar resd 1
+
+
+temppatid resd 1
+temppatname resb 64
+tempdis resd 1
 counter resb 1;so also , .bss initializes to 0 with every new var created here 
 
 count resb 1
@@ -319,11 +326,11 @@ _start:
     cmp al,13
     je .patmenu_handel
     cmp al,14
-    je pat_fill
+    je .pat_fill
     cmp al,15
-    je pat_fill
+    je .pat_fill
     cmp al,16
-    je pat_fill
+    je .pat_fill
 
 
 
@@ -673,7 +680,7 @@ _start:
     cmp al,1
     je .cpy_name_pat
     cmp al,2
-    je .cpy_age_pat
+    je .cpy_dis_pat
     jmp .loop
 .nur_fill:
     mov al,[counter]
@@ -709,6 +716,45 @@ _start:
     call push_nur
     jmp .set_mode0
     jmp .loop
+
+
+
+
+.cpy_id_pat:
+    lea rdi,[input]
+    call atoi
+    mov [temppatid],eax;eax is the lower 32 bits , 
+    inc byte [counter]
+    mov byte [mode],9
+    jmp .loop
+.cpy_name_pat:
+    lea rsi,[input]
+    lea rdi,[temppatname]
+    mov rcx, 64
+    rep movsb
+    inc byte [counter]
+    mov byte [mode],10
+    jmp .loop
+.cpy_dis_pat:
+    lea rsi,[input]
+    lea rdi,[tempdis]
+    mov rcx, 64
+    rep movsb
+    inc byte [counter]
+    mov byte [mode],7
+    call push_pat
+    jmp .set_mode0
+    jmp .loop
+
+
+
+
+
+
+
+
+
+
 
 
 .cpy_id_doc:
@@ -1081,14 +1127,83 @@ push_pat:
     mov  rbp, rsp
     mov rax,[pat_vec_cap]
     cmp rax,[pat_vec_len]
-    jg .affectp
-    je .expandp
+    jg .affect_pat
+    je .expand_pat
     inc qword [pat_vec_len]
     leave
     ret 
 
+.affect_pat:
+    mov rbx,[pat_vec_data]
+    mov rax,[pat_vec_len]
+    imul rax,patient_size
+    add rbx,rax
+    mov eax,[temppatid]
+    mov [rbx+patient.id],eax
+    lea rsi,[temppatname]
+    lea rdi,[rbx+patient.name]
+    mov rcx,64
+    rep movsb;apparently this is the assembly version of string copy , 1st and second arguments (rsi,rsd)then call with setting rcx to 64 and rep movsb
+    mov eax,[tempdis]
+    mov [rbx+patient.disease],eax
+    inc qword [pat_vec_len]
+    mov [mode],1
+    leave
+    ret 
 
-.affectp:
+
+
+
+
+.expand_pat:
+    push rbx
+    push r12
+    mov r12,[pat_vec_data]
+    mov rbx , [pat_vec_cap]
+    
+    
+    mov rax,9
+    xor rdi,rdi
+    mov rsi,[pat_vec_cap]
+    shl rsi,1
+    imul rsi,patient_size
+    mov rdx,3
+    mov r10d,0x22
+    mov r8d,-1
+    mov r9d,0
+    syscall
+
+
+
+   
+    mov rdi,rax
+    mov rsi,r12
+    mov rcx,[pat_vec_len]
+    imul rcx,patient_size
+    rep movsb
+
+    push rax
+    mov rdi,r12
+    imul rbx,patient_size
+    mov rsi,rbx
+    mov rax,11
+    syscall
+    pop rax
+
+    mov [pat_vec_data],rax
+    shl qword [pat_vec_cap],1
+    pop r12
+    pop rbx
+    jmp .affect_pat
+
+
+
+;.copy:
+ ;   imul rcx,doctor_size
+  ;  lea rsi,[vec_data+rcx]
+   ; lea rsd,[rdi+rcx]
+
+
 
 
 
