@@ -171,7 +171,9 @@ an_dis_len equ $ -announ_dis
 
 
 
-
+pat_del:
+    db "patient deleted !",10
+pat_del_len equ $ -doc_del
 
 
 
@@ -337,6 +339,8 @@ _start:
     je .pat_fill
     cmp al,17
     je .ssearch_hp
+    cmp al,18
+    je .ddeletep
 
 
 
@@ -431,6 +435,50 @@ _start:
     mov rdx,nur_del_len
     syscall
     dec qword [nur_vec_len]
+    
+    mov [mode],0
+    jmp .loop
+
+.ddeletep:
+    xor rcx, rcx 
+    lea rdi,[input]
+    call atoi
+    mov r12d,eax
+    xor rcx,rcx
+    jmp .deletep
+.deletep:
+    cmp rcx,[pat_vec_len]
+    je .not_found
+    mov rbx,[pat_vec_data]
+    mov rdx,rcx
+    imul rdx,patient_size
+    add rbx,rdx
+    cmp [rbx+patient.id],r12d
+    mov rdi,rbx
+    
+    je .delete_mfp
+    inc rcx
+    jmp .deletep
+.delete_mfp:
+;so every push saves the state and every pop ressurects it , hmm
+    cmp rcx,[pat_vec_len]
+    je .ddone
+    lea rsi,[rdi+patient_size]
+    mov rax,[pat_vec_len]
+    sub rax,rcx
+    dec rax
+    imul rax,patient_size
+    mov rcx,rax 
+    rep movsb
+    
+
+.ddonep:
+    mov rax,1;a write call
+    mov rdi,1; serves as "set mode to std::out as there is also a file mode"
+    lea rsi,pat_del
+    mov rdx,pat_del_len
+    syscall
+    dec qword [pat_vec_len]
     
     mov [mode],0
     jmp .loop
